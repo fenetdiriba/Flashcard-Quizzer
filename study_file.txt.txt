@@ -1,0 +1,20 @@
+What is the capital city? | DC
+What is your name? | Fenet
+What is the class? | CS
+What way does the sun set? | West
+What color is the sky? | Blue
+How many days are in a week? | 7
+What is 2 + 2? | 4
+What do bees make? | Honey
+What is the opposite of hot? | Cold
+What planet do we live on? | Earth
+What do cows drink? | Water
+What is H2O? | Water
+What animal barks? | Dog
+What shape has three sides? | Triangle
+What is the first month of the year? | January
+Which season is the coldest? | Winter
+What is the color of grass? | Green
+What do plants need to grow? | Sunlight 
+What is the largest ocean? | Pacific
+What is the main language of the U.S.? | English

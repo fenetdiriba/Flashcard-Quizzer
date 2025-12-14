@@ -1,0 +1,255 @@
+import random
+
+class Flashcard:
+    
+    def __init__(self, question, answer, seen = 0, correct = 0):
+        
+        self.answer = answer 
+        self.question = question
+        self.seen = int(seen)
+        self.correct = int(correct)
+        
+    def check_answer(self, user_input):
+        
+        # seen variable 
+        self.seen += 1
+        
+        # if the user's answer is the same as the answer in the quiz file then 
+        is_correct = user_input.strip().lower() == self.answer.strip().lower()
+        
+        # check if the user's input is correct
+        if is_correct:
+            self.correct += 1
+            
+        return  is_correct
+    
+class ProgressStore:
+    
+    def __init__(self, filename = "progress_data.txt"):
+        self.filename = filename
+        
+    # goes through filename and gets the seen and correct for each question   
+    def load_progress(self):
+        
+        # initialize an empty dictionary to store progress for each flashcard
+        progress_data = {}
+        
+        try:
+            # Open the progress file in read mode
+            with open(self.filename, 'r') as f:
+                for line in f:
+                    parts = line.split('|')
+                    
+                    # Extract question, seen count, and correct count
+                    question = parts[0]
+                    seen = int(parts[1])
+                    correct = int(parts[2])
+                     
+                    # Store the data in the dictionary with the question as key
+                    progress_data[question] = {"seen": seen, "correct": correct}
+                               
+            return progress_data
+        
+        # handle cases where the file does not exist 
+        except:
+            return {}
+        
+    # saves the user's current progress for all flashcards to a file           
+    def save_progress(self, flashcards):
+        
+        try:
+            # 'w' mode opens the file for writing (and overwrites it)
+            with open(self.filename, 'w') as f:
+                for card in flashcards:
+                    # Format the data: Question|Seen|Correct\n
+                    line = f"{card.question}|{card.seen}|{card.correct}\n"
+                    f.write(line)
+                    
+        # for catching any errors that might occur while writing to the file     
+        except Exception as e:
+            print(f"Error saving progress: {e}") 
+                               
+                               
+                                
+class QuizEngine:
+    
+    def __init__(self, file_name = "study_file.txt", progress_store = None ):
+        self.file_name = file_name
+        self.deck = []
+        self.progress_store = progress_store
+     
+    def get_raw_data(self):
+        session_size = 10 # controls number of questions
+        raw_data = []
+
+        try:
+            # open and read our text file
+            with open(self.file_name, "r") as file:
+                lines = file.readlines()  # read all lines into a list
+                
+            # checks if the study file has enough cards
+            if len(lines) < session_size:
+                print("Error: Not enough flashcards in the file.")
+                return []
+
+            # picks random starting point for selecting flashcards
+            start_idx = random.randint(0, len(lines) - session_size)
+
+            # loop over question in text file
+            for i in range(session_size):
+                # split the line into question and answer
+                pair = lines[i + start_idx].split("|")  
+
+                # get question and answer 
+                question = pair[0].strip()  
+                answer = pair[1].strip()
+
+                # append flashcard to deck
+                raw_data.append(Flashcard(question, answer))
+                
+        # if file doesnt exist
+        except FileNotFoundError:
+            print(f"Error: The study file '{self.file_name}' was not found.")
+
+        return raw_data
+
+    
+    # Loads flashcards from the study file and applies stored progress
+    def load_deck(self):
+    
+        # Load raw data from study file
+        self.deck = self.get_raw_data()
+    
+        # If no progress_store, stop here
+        if not self.progress_store:
+            return bool(self.deck)
+    
+        # Load previous progress
+        progress_data = self.progress_store.load_progress()
+    
+        # Apply stored seen/correct values
+        if progress_data:
+            for card in self.deck:
+                if card.question in progress_data:
+                    saved = progress_data[card.question]
+                    card.seen = saved["seen"]
+                    card.correct = saved["correct"]
+                    
+        # return true if successfully loaded
+        return bool(self.deck)  
+
+    # Calculates and displays improvement
+    def _display_progress_report(self, session_score, last_score):
+        
+        total_cards = len(self.deck)
+        total_seen = 0
+        total_correct = 0
+
+        # Update total number of seen and correct
+        for card in self.deck:
+            total_seen += card.seen
+            total_correct += card.correct
+
+        print("\nSession Ended!")
+        print(f"Score: {session_score} / {total_cards}")
+
+        # First session (no previous score)
+        if last_score is None:
+            return
+
+        # Last score is 0 and current score is 0
+        if last_score == 0 and session_score == 0:
+            print("Improvement: 0%")
+            return 
+        
+        # Perfect score again
+        if last_score == session_score and session_score == total_cards:
+            print(f"Perfect Score Again!")
+            return
+        
+        # Normal calculation
+        improvement = session_score - last_score
+        
+        # So we dont get negative improvement 
+        if last_score > session_score:
+            percent_improvement = 0
+            
+        # handles division by zero error
+        elif last_score == 0:
+             percent_improvement = (session_score/total_cards) * 100
+                
+        else:
+             percent_improvement = (improvement/ last_score) * 100
+        
+        print(f"Improvement: {percent_improvement:.1f}%")
+            
+        # Overall effectiveness
+        if total_seen == 0:
+            overall_effectiveness = 0
+        else:
+            overall_effectiveness = (total_correct / total_seen) * 100
+    
+        print(f"Overall Effectiveness: {overall_effectiveness:.1f}%")
+          
+            
+    def start_session(self, last_score_file = "last_score.txt"):
+        
+        # if deck is empty, program doesnt run   
+        if not self.deck: 
+            print("No flashcards found. Please check your study file.")
+            return
+          
+        # get last session score    
+        try:
+            with open(last_score_file, "r") as f:
+                last_score = int(f.read().strip())
+                
+        # if no last session score(starting fresh)        
+        except:
+            last_score = 0
+                                 
+        random.shuffle(self.deck)    # shuffle the flashcards
+        total_cards = len(self.deck) # number of flashcards
+        session_score = 0            # number of attempts
+        
+        print("Quiz is starting...")
+        
+
+        # loop through flashcard in decks
+        for card in self.deck:
+            
+            print(f"Question: {card.question}")
+            
+            user_input = input("Enter your answer:") 
+        
+            # if user gets the answer correct, update score
+            if card.check_answer(user_input):
+                print("Correct!")
+                session_score += 1
+                
+            else:
+                print(f"Incorrect. The correct answer is {card.answer}")
+   
+        self.progress_store.save_progress(self.deck) # save progress 
+
+        # Display the comparison report
+        self._display_progress_report(session_score, last_score)
+        
+        # Save the current score to be used as the last_score next time
+        with open("last_score.txt", "w") as f:
+            f.write(str(session_score))
+                        
+# The main entry point for the flashcard quizzer                
+def main():
+    
+    # Initialize the QuizEngine
+    quiz_engine = QuizEngine(file_name="study_file.txt", progress_store=ProgressStore())
+
+    # Load flashcards and apply saved progress
+    if quiz_engine.load_deck():
+        
+        # Start the quiz session
+        quiz_engine.start_session()
+        
+# testing code       
+main()
