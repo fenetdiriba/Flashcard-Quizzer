@@ -4,25 +4,25 @@ This project is an interactive, command-line Flashcard Quiz System developed in 
 The project was created to enhance skills in data persistence, randomized logic, and structured programming within the Python environment.
 # Features
 Randomized Quizzing:
-- What it Does: Selects flashcards in a completely random order during each session.
+- What it does: Selects flashcards in a completely random order during each session.
 - Why it's Useful: Prevents memorization based on order and ensures you genuinely know the material across the entire deck.
 Progress Persistence:
-- What it Does: Saves the accuracy data for every single flashcard across all study sessions.
-- Why it's Useful: Allows for accurate, long-term performance tracking, enabling targeted study sessions on weaker topics.
+- What it does: Saves the accuracy data for every single flashcard across all study sessions.
+- Why it's useful: Allows for accurate, long-term performance tracking, enabling targeted study sessions on weaker topics.
 Performance Reports:
-- What it Does: Generates a comprehensive summary of scores and highlights the most difficult cards immediately after a session.
-- Why it's Useful: Instantly shows you which topics require the most urgent review time, optimizing your study plan.
+- What it does: Generates a comprehensive summary of scores and highlights the most difficult cards immediately after a session.
+- Why it's useful: Instantly shows you which topics require the most urgent review time, optimizing your study plan.
 Easy Deck Customization:
-- What it Does: Flashcard questions and answers are loaded from a simple, external data file (e.g., JSON or TXT).
-- Why it's Useful: Allows for quick and effortless modification, expansion, or removal of the deck contents without ever needing to touch the core Python code.
+- What it does: Flashcard questions and answers are loaded from a simple, external data file (e.g., JSON or TXT).
+- Why it's useful: Allows for quick and effortless modification, expansion, or removal of the deck contents without ever needing to touch the core Python code.
 # How to Run
 To get the Flashcard Quizzer running on your local machine:
 1. Set Up Environment: Ensure that Python 3.x is installed on your system.
 2. Clone the Repository: Open your terminal and download the project files from GitHub:
    git clone https://github.com/fenetdiriba/Flashcard-Quizzer.git
-cd Flashcard-Quizzer
+   cd Flashcard-Quizzer
 3. Execute the Program: Run the main Python script from your terminal. (Use the actual filename of your main script if it's different from the example below):
-   python flashcard_quizzer.py
+    python flashcard_quizzer.py
 # Example Usage Flow
 The program provides a simple, interactive workflow designed for continuous learning:
 1. Load Session: The system loads your flashcard deck and retrieves your previously saved performance data.
